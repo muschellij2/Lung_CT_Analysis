@@ -3,4 +3,4 @@ Analysis of Lung CT from NIH
 
 This is a shared repo - testing
 
-BRUCE in the house ... (?)
+BRUCE in the house !
