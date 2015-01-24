@@ -3,6 +3,7 @@ library(fslr)
 library(cttools)
 homedir = '/dcs01/oasis/biostat/bswihart'
 progdir = file.path(homedir, "programs")
+setwd(file.path(homedir, 'data', "A225"))
 source(file.path(progdir, "SUV.R"))
 files = c("A225_20120312_1035_CT_2_CHEST_ITRC__Body-Low.nii.gz",
 	"A225_20120312_1034_PT_179490_CHEST_ITRC__p1591s1_wb_ctac.img_.nii.gz"	)
@@ -66,8 +67,19 @@ outfiles = tempfile(fileext = ".nii.gz")
 
 spm_reslice(files = images, outfiles = outfiles)
 
-ct = readNIfTI(files[1], reorient=FALSE)
+ct = images[[1]]
+lung_mask = CT_lung_mask(ct)
 
 pet = readNIfTI(outfiles[1], reorient=FALSE)
 
+pet[is.nan(pet)] = 0
+pet[ pet < 0 ] = 0
+pet = cal_img(pet)
 
+pet.lung = mask_img(pet, lung_mask)
+
+
+df = data.frame(ct = ct[lung_mask == 1], 
+	pet = pet[lung_mask == 1])
+
+samp = df[sample(nrow(df), size = 1e5),]
